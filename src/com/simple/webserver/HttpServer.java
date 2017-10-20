@@ -15,7 +15,7 @@ public class HttpServer {
 		HttpServer server = new HttpServer();
 		server.awiat();
 	}
- 
+
   public void awiat(){
 	  try {
 		ServerSocket serverSocket = new ServerSocket(8080,1,InetAddress.getByName("127.0.0.1"));
@@ -27,15 +27,23 @@ public class HttpServer {
 			request.parse();
 			Response response = new Response(outputStream);
 			response.setRequest(request);
-			response.sendStaticResource();
+			if(request.getUri()==null){
+			continue;
+			}
+			if(request.getUri().startsWith("/servlet/")){
+                ServletProcessor servletProcessor = new ServletProcessor();
+				servletProcessor.process(request,response);
+			}else {
+                response.sendStaticResource();
+            }
 			socket.close();
 			shutdown = request.getUri().equals(SHUTDOWN_COMMAND);
 		}
-		
+
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
   }
-  
+
 }
